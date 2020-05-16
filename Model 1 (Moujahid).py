@@ -9,9 +9,16 @@
 
 ### Needed libraries ###
 
+# For pairing x- and y-values to create Cartesian products; an ordered pair represents the address a resident
 import itertools
+
+# For shuffling all houses in the community to randomly assign them to residents; and for choosing a random empty house to move into (for unhappy residents)
 import random as rd
+
+# For visualizing the distribution of the residents using scatterplot
 import matplotlib.pyplot as plt
+
+# For checking if a filename already exists, to avoid overwriting files
 import os
 
 
@@ -22,7 +29,7 @@ class Schelling:
 	def __init__(self, width, height, empty_ratio, happiness_threshold, groups, n_iterations):
 		
         # Width of community grid
-        self.width = width
+		self.width = width
         
         # Height of community grid
 		self.height = height
@@ -54,7 +61,7 @@ class Schelling:
 		all_houses = list(itertools.product(range(self.width), range(self.height)))
 		
         # Shuffle the order of houses
-        rd.shuffle(all_houses)
+		rd.shuffle(all_houses)
         
         # Determine number of empty houses
 		n_empty = int(self.empty_ratio*len(all_houses))
@@ -65,12 +72,12 @@ class Schelling:
         # Assign the rest to be occupied
 		remaining_houses = all_houses[n_empty : ]
         
-        # Assign houses to residents
+        # Assign houses by group to residents
 		houses_by_group = [remaining_houses[i::self.groups] for i in range(self.groups)]
 		
         # Create dictionary of residents
         # Each resident is defined by his address and group number
-        for i in range(self.groups):
+		for i in range(self.groups):
 			agent = dict(zip(houses_by_group[i], [i+1]*len(houses_by_group[i])))
 			self.agents.update(agent)
 
@@ -93,60 +100,60 @@ class Schelling:
 				count_different += 1
 		
         # Check similarity with bottom neighbor
-        if y > 0 and (x, y-1) not in self.empty_houses:
+		if y > 0 and (x, y-1) not in self.empty_houses:
 			if self.agents[(x, y-1)] == group:
 				count_similar += 1
 			else:
 				count_different += 1
 		
         # Check similarity with bottom right neighbor
-        if x < (self.width-1) and y > 0 and (x+1, y-1) not in self.empty_houses:
+		if x < (self.width-1) and y > 0 and (x+1, y-1) not in self.empty_houses:
 			if self.agents[(x+1, y-1)] == group:
 				count_similar += 1
 			else:
 				count_different += 1
 		
         # Check similarity with left neighbor
-        if x > 0 and (x-1, y) not in self.empty_houses:
+		if x > 0 and (x-1, y) not in self.empty_houses:
 			if self.agents[(x-1,y)] == group:
 				count_similar += 1
 			else:
 				count_different += 1
 		
         # Check similarity with right neighbor
-        if x < (self.width-1) and (x+1, y) not in self.empty_houses:
+		if x < (self.width-1) and (x+1, y) not in self.empty_houses:
 			if self.agents[(x+1,y)] == group:
 				count_similar += 1
 			else:
 				count_different += 1
 		
         # Check similarity with upper left neighbor
-        if x > 0 and y < (self.height-1) and (x-1, y+1) not in self.empty_houses:
+		if x > 0 and y < (self.height-1) and (x-1, y+1) not in self.empty_houses:
 			if self.agents[(x-1,y+1)] == group:
 				count_similar += 1
 			else:
 				count_different += 1        
 		
         # Check similarity with upper neighbor
-        if x > 0 and y < (self.height-1) and (x, y+1) not in self.empty_houses:
+		if x > 0 and y < (self.height-1) and (x, y+1) not in self.empty_houses:
 			if self.agents[(x,y+1)] == group:
 				count_similar += 1
 			else:
 				count_different += 1        
 		
         # Check similarity with upper right neighbor
-        if x < (self.width-1) and y < (self.height-1) and (x+1, y+1) not in self.empty_houses:
+		if x < (self.width-1) and y < (self.height-1) and (x+1, y+1) not in self.empty_houses:
 			if self.agents[(x+1,y+1)] == group:
 				count_similar += 1
 			else:
 				count_different += 1
 		
         # Resident is NOT unhappy, i.e., happy if he has no neighbors
-        if (count_similar + count_different) == 0:
+		if (count_similar + count_different) == 0:
 			return False
 		
         # Check if similarity ratio is below happiness threshold
-        else:
+		else:
 			return float(count_similar/(count_similar + count_different)) < self.happiness_threshold
 
     ## Resident moves if he is unhappy
@@ -224,53 +231,53 @@ class Schelling:
 					count_different += 1
 			
             # Check similarity with bottom right neighbor
-            if x < (self.width-1) and y > 0 and (x+1, y-1) not in self.empty_houses:
+			if x < (self.width-1) and y > 0 and (x+1, y-1) not in self.empty_houses:
 				if self.agents[(x+1, y-1)] == group:
 					count_similar += 1
 				else:
 					count_different += 1
 			
             # Check similarity with left neighbor
-            if x > 0 and (x-1, y) not in self.empty_houses:
+			if x > 0 and (x-1, y) not in self.empty_houses:
 				if self.agents[(x-1, y)] == group:
 					count_similar += 1
 				else:
 					count_different += 1        
 			
             # Check similarity with right neighbor
-            if x < (self.width-1) and (x+1, y) not in self.empty_houses:
+			if x < (self.width-1) and (x+1, y) not in self.empty_houses:
 				if self.agents[(x+1, y)] == group:
 					count_similar += 1
 				else:
 					count_different += 1
 			
             # Check similarity with upper left neighbor
-            if x > 0 and y < (self.height-1) and (x-1, y+1) not in self.empty_houses:
+			if x > 0 and y < (self.height-1) and (x-1, y+1) not in self.empty_houses:
 				if self.agents[(x-1, y+1)] == group:
 					count_similar += 1
 				else:
 					count_different += 1        
 			
             # Check similarity with upper neighbor
-            if x > 0 and y < (self.height-1) and (x, y+1) not in self.empty_houses:
+			if x > 0 and y < (self.height-1) and (x, y+1) not in self.empty_houses:
 				if self.agents[(x, y+1)] == group:
 					count_similar += 1
 				else:
 					count_different += 1        
 			
             # Check similarity with upper right neighbor
-            if x < (self.width-1) and y < (self.height-1) and (x+1, y+1) not in self.empty_houses:
+			if x < (self.width-1) and y < (self.height-1) and (x+1, y+1) not in self.empty_houses:
 				if self.agents[(x+1,y+1)] == group:
 					count_similar += 1
 				else:
 					count_different += 1
 			
             # Place similarity ratio in the list
-            try:
+			try:
 				similarity.append(float(count_similar/(count_similar + count_different)))
 			
             # If there are no neighbors, similarity ratio is 1
-            except:
+			except:
 				similarity.append(1)
         
         # Compute average similarity ratio over all residents
@@ -278,7 +285,7 @@ class Schelling:
 
     ## Visualize the state
 
-	def plot(self, state):
+	def visualize(self, state):
         
         # Initialize subplots
 		fig, ax = plt.subplots()
@@ -288,20 +295,16 @@ class Schelling:
         
         # Create a scatterplot for each resident, colored based on his group
 		for agent in self.agents:
-			ax.scatter(agent[0]+0.5, agent[1]+0.5, color = agent_colors[self.agents[agent]],
-									edgecolors = 'white')
+			ax.scatter(agent[0]+0.5, agent[1]+0.5, color = agent_colors[self.agents[agent]], edgecolors = 'white')
 		
         # Title
-        ax.set_title('Schelling Model: ' + state + ' State' + '\n' + 'Similarity: '
-									+ str("{:.1f}".format(schelling.similarity()*100)) + '%')
+		ax.set_title('Schelling Model: ' + state + ' State' + '\n' + 'Similarity: ' + str("{:.1f}".format(schelling.similarity()*100)) + '%')
 		
         # Horizontal axis label
-        ax.set_xlabel(str(self.empty_ratio*100) + '% Empty Houses' + '\n'
-									+ str(self.happiness_threshold*100) + '% Happiness Threshold' + '\n'
-									+ str(self.groups) + ' groups')
+		ax.set_xlabel(str(self.empty_ratio*100) + '% Empty Houses' + '\n' + str(self.happiness_threshold*100) + '% Happiness Threshold' + '\n' + str(self.groups) + ' groups')
 		
         # Ensure all residents are visible
-        ax.set_xlim([0, self.width])
+		ax.set_xlim([0, self.width])
 		ax.set_ylim([0, self.height])
         
         # Remove extra tick marks on the axes
@@ -326,20 +329,21 @@ class Schelling:
 ### Simulation ###
 
 # Initialize parameters
-schelling = Schelling(width = 25, height = 25, empty_ratio = 0.25, happiness_threshold = 0.30,
-											groups = 2, n_iterations = 500)
+schelling = Schelling(width = 25, height = 25, empty_ratio = 0.25, happiness_threshold = 0.30, groups = 2, n_iterations = 500)
 
 # Place residents on the community
 schelling.populate()
 
 # Visualize initial state
-schelling.plot('Initial')
+schelling.visualize('Initial')
 
 # Allow unhappy residents to move
 schelling.move()
 
 # Visualize final state
-schelling.plot('Final')
+schelling.visualize('Final')
+
+####### End of Code #######
 
 
 

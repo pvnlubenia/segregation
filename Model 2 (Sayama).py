@@ -9,8 +9,13 @@
 
 ### Needed libraries ###
 
+# For assigning a random location to agents
 import random as rd
+
+# For visualizing the distribution of agents using plot
 import matplotlib.pyplot as plt
+
+# For checking if a filename already exists, to avoid overwriting files
 import os
 
 
@@ -72,7 +77,7 @@ def group_by_number():
 
 def move():
     
-    # Allow nmber of iterations done to be accessed outside the function
+    # Allow number of iterations done to be accessed outside the function
 	global iteration
     
     # Maximum iterations allowed
@@ -85,19 +90,19 @@ def move():
 		for agent_ in agents_list:
             
             # Create list of neighbors within the radius specified
-			neighbors = [neighbor for neighbor in agents_list
-										if (agent_.x - neighbor.x)**2 + (agent_.y - neighbor.y)**2 < radius**2 and
-												neighbor != agent_]
+			neighbors = [neighbor for neighbor in agents_list if (agent_.x - neighbor.x)**2 + (agent_.y - neighbor.y)**2 < radius**2]
+
+            # Remove resident himself from list of neighbors
+			neighbors.remove(agent_)
 			
             # Check if there are neighbors within the radius
-            if len(neighbors) > 0:
+			if len(neighbors) > 0:
                 
                 # Compute similarity ratio
-				satisfaction = len([neighbor for neighbor in neighbors
-														if neighbor.group == agent_.group])/len(neighbors)
+				satisfaction = len([neighbor for neighbor in neighbors if neighbor.group == agent_.group])/len(neighbors)
 				
                 # Move resident to a random location if similarity ratio is below threshold
-                if satisfaction < threshold:
+				if satisfaction < threshold:
 					agent_.x, agent_.y = rd.random(), rd.random()
                     
                     # Count as a move
@@ -123,26 +128,27 @@ def similarity_ratio():
 	for agent_ in agents_list:
         
         # Create list of neighbors within the radius specified
-		neighbors = [neighbor for neighbor in agents_list
-									if (agent_.x - neighbor.x)**2 + (agent_.y - neighbor.y)**2 < radius**2 and
-											neighbor != agent_]
+		neighbors = [neighbor for neighbor in agents_list if (agent_.x - neighbor.x)**2 + (agent_.y - neighbor.y)**2 < radius**2]
+
+        # Remove resident himself from list of neighbors
+		neighbors.remove(agent_)
+
 		# Check if there are neighbors within the radius
-        if len(neighbors) > 0:
+		if len(neighbors) > 0:
 			
             # Place similarity ratio in the list
-            try:
-				similarity_ratios.append(len([neighbor for neighbor in neighbors
-																			if neighbor.group == agent_.group])/len(neighbors))
+			try:
+				similarity_ratios.append(len([neighbor for neighbor in neighbors if neighbor.group == agent_.group])/len(neighbors))
 			
             # If there are no neighbors, similarity ratio is 1
-            except:
+			except:
 				similarity_ratios.append(1)
 	
     # Compute average similarity ratio over all residents
-    overall_similarity_ratio = sum(similarity_ratios)/len(similarity_ratios)
+	overall_similarity_ratio = sum(similarity_ratios)/len(similarity_ratios)
 	
     # Outputs overall similarity ratio
-    return overall_similarity_ratio
+	return overall_similarity_ratio
 
 
 
@@ -158,32 +164,27 @@ def visualize(state):
 		ax.plot([agent_.x for agent_ in group[Group]], [agent_.y for agent_ in group[Group]], 'o')
 	
     # Title
-    ax.set_title(state + ' State' + ' || '
-								+ 'Segregation: ' + str("{:.1f}".format(similarity_ratio()*100)) + '%')
+	ax.set_title(state + ' State' + ' || ' + 'Segregation: ' + str("{:.1f}".format(similarity_ratio()*100)) + '%')
 	
     # Horizontal axis label
-    ax.set_xlabel(str(n_agents) + ' Residents' + ' || '
-								+ str(groups) + ' Groups' + ' || '
-								+ str(radius*100) + '% Neighborhood || '
-								+ str(threshold*100) + '% Threshold' + '\n'
-								+ 'moves: ' + str(iteration))
+	ax.set_xlabel(str(n_agents) + ' Residents' + ' || ' + str(groups) + ' Groups' + ' || ' + str(radius*100) + '% Neighborhood || ' + str(threshold*100) + '% Threshold' + '\n' + 'moves: ' + str(iteration))
 	
     # Remove extra tick marks on the axes
-    ax.set_xticks([])
+	ax.set_xticks([])
 	ax.set_yticks([])
 	
     # Prepare format of file name
-    filename = 'Model2_' + state
+	filename = 'Model2_' + state
 	
     # Starting filename count
-    i = 1
+	i = 1
     
     # Check if filename already exists; add 1 if it does
 	while os.path.exists('{}{:d}.png'.format(filename, i)):
 		i += 1
 	
     # Save figure
-    plt.savefig('{}{:d}.png'.format(filename, i), bbox_inches = 'tight', dpi = 300)
+	plt.savefig('{}{:d}.png'.format(filename, i), bbox_inches = 'tight', dpi = 300)
 
 
 
@@ -221,6 +222,8 @@ move()
 
 # Visualize initial state
 visualize('Final')
+
+####### End of Code #######
 
 
 
